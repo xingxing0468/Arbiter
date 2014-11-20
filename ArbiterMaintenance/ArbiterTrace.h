@@ -1,24 +1,32 @@
-#ifndef _ARBITER_TRACE__H
+#ifndef _ARBITER_TRACE_H
 #define _ARBITER_TRACE_H
 
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
 #include "stdlib.h"
+#include <sys/types.h>
+#include <unistd.h>
+
 
 namespace ArbiterMaintenance
 {
-
+    enum APP_NAME_INDEX
+    {
+        APP_NAME_SERVER,
+        APP_NAME_CLIENT,
+    };
 	const static std::string Category[]			= {"Message Queue", 		"SOCKET"		      };
 	const static std::string Action[]			= {"NONE",			"Create",			"Bind",
-								   "Set Option",		"Listen",			"Accept",
+                                   "Set Option",		"Listen",			"Accept",
 								   "Connect",			"Send",				"Send To",
 								   "Receive",			"Receive From",			"Unlink",
 					         		   "Close",			"Remove",			"Open File Descriptor",
 								   "Close File",		"Read File",		 	"Write FILE",
 								   "Flush File",		"CLose File"};
+
 	const static std::string APP_NAME[]			= {"Server",	"Client"};
-	class ArbiterTracer
+    class ArbiterTracer
 	{
 	public:
 		enum TRACE_LEVEL
@@ -63,8 +71,9 @@ namespace ArbiterMaintenance
 			SERVERITY_ERROR		= 1,
 		};
 	
-		static TRACE_LEVEL TraceLevel;
+        static TRACE_LEVEL TraceLevel;
 		static std::string AppName;
+        static std::string ProcessName;
 
 		static void WriteLine(CATEGORY eCategory, ACTION eAction, SERVERITY eServerity, std::string message)
 		{
@@ -93,23 +102,7 @@ namespace ArbiterMaintenance
 			return WriteLine(eCategory, eAction, SERVERITY_ERROR, msgStr);
 		};
 	};
-	IpcTracer::TRACE_LEVEL  IpcTracer::TraceLevel	= IpcTracer::TRACE_LEVEL_INFO;
-	std::string		IpcTracer::AppName	= APP_NAME[APP_NAME_SERVER];
-	std::string 		IpcTracer::ProcessName;
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif
