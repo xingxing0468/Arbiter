@@ -23,7 +23,7 @@ namespace ArbiterMaintenance
 								   "Receive",			"Receive From",			"Unlink",
 					         		   "Close",			"Remove",			"Open File Descriptor",
 								   "Close File",		"Read File",		 	"Write FILE",
-								   "Flush File",		"CLose File"};
+                                   "Flush File",		"CLose File",       "TCP Shake Hand"};
 
 	const static std::string APP_NAME[]			= {"Server",	"Client"};
     class ArbiterTracer
@@ -63,6 +63,8 @@ namespace ArbiterMaintenance
 			ACTION_WRITE_FP,
 			ACTION_FLUSH_FP,
 			ACTION_CLOSE_FP,
+
+            ACTION_TCP_SHAKE_HAND,
 		};
 
 		enum SERVERITY

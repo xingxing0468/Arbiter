@@ -8,13 +8,46 @@ ArbiterRC SocketIpc::InitSender()
 {
     ArbiterRC rc = ARBITER_OK;
 
+    ArbiterTracer::TraceLevel = ArbiterTracer::TRACE_LEVEL_INFO;
+
+    int serverSockFd = 0, clientSockFd = 0;
+        sockaddr_un serverSockAddr, clientSockAddr;
+        const char* socketAddrStr = ControlService::SOCKET_ADDR.c_str();
+        int on = 1, clientSockAddrSize;
+        FILE *fp = NULL;
+        const char* sendBuf = "This is Hello From Client!";
+    std::string sendStr(sendBuf);
+        clientSockAddr.sun_family = AF_LOCAL;
+    memcpy(&clientSockAddr.sun_path, socketAddrStr, strlen(socketAddrStr) + 1);
+        if((clientSockFd = socket(AF_LOCAL, SOCK_DGRAM, 0)) < 0)
+        {
+                ControlService::IpcTracer::Error(IpcTracer::CATEGORY_SOCKET,     IpcTracer::ACTION_CREATE, errno);
+                rc = 1000 * IpcTracer::ACTION_CREATE + errno;
+                goto Exit;
+        }
+    if(sendto(clientSockFd, sendBuf, strlen(sendBuf) + 1, 0, (sockaddr*)(&clientSockAddr), (socklen_t)sizeof(sockaddr_un)) < 0)
+        {
+                ControlService::IpcTracer::Error(IpcTracer::CATEGORY_SOCKET,     IpcTracer::ACTION_SEND_TO, errno);
+                rc = 1000 * IpcTracer::ACTION_SEND_TO + errno;
+                goto Exit;
+        }
+    ControlService::IpcTracer::WriteLine(IpcTracer::CATEGORY_SOCKET, IpcTracer::SERVERITY_INFO, "Message: [" + sendStr + "] sent");
+
+
+
+Exit:
+    if((close(clientSockFd)) != 0)
+        {
+                ControlService::IpcTracer::Error(IpcTracer::CATEGORY_SOCKET,     IpcTracer::ACTION_CLOSE_FD, errno);
+                rc = 1000 * IpcTracer::ACTION_CLOSE_FD + errno;
+        }
 Exit:
     return rc;
 }
 ArbiterRC SocketIpc::InitReceiver()
 {
         int serverSockFd = 0, clientSockFd = 0;
-        sockaddr_un serverSockAddr, clientSockAddr;
+
         serverSockAddr.sun_family = AF_LOCAL;
         const char* socketAddrStr = SocketIpc::DEFAULT_SOCKET_ADDR.c_str();
         int on = 1, clientSockAddrSize;

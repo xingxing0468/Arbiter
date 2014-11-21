@@ -14,14 +14,17 @@ namespace ArbiterTransport {
 class SocketIpc : public ArbiterBasicTransport
 {
 public:
-    SocketIpc(): m_socketAddr(DEFAULT_SOCKET_ADDR) {};
+    SocketIpc():  {
+        serverSockAddr = DEFAULT_SOCKET_ADDR;
+    }
     ArbiterRC InitSender();
     ArbiterRC InitReceiver();
 private:
-    std::string                 m_socketAddr;
-    int                         m_socketFd;
 
+    int                         m_socketFd;
+    sockaddr_un                 m_sockAddr;
     const static std::string    DEFAULT_SOCKET_ADDR     =           "/tmp/MySocketAddr";
+
 };
 
 }

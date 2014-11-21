@@ -8,17 +8,22 @@ namespace ArbiterDataService {
 class TcpDataItem : public DataServiceItem
 {
 public:
-    TcpDataItem(ArbiterBasicTransport *transport)
-    {
-         m_transport = transport;
+    TcpDataItem(){
+
     }
-    ArbiterRC   Update();
-    ArbiterRC   InitConnection();
+    ArbiterRC                           Update();
+    ArbiterRC                           Init()
+    {
+        m_socketDomain = AF_LOCAL;
+        m_socketType   = SOCK_STREAM;
+        return DataServiceItem::Init();
+    }
+    ArbiterRC                           Disconnect();
+    ArbiterRC                           ShakeHand();
 protected:
 
 private:
-    std::string                 m_sendingStr;
-    std::string                 m_receivedStr;
+    const static int                    MAX_TCP_CONTENT_LENGTH = 512;
 };
 
 }
