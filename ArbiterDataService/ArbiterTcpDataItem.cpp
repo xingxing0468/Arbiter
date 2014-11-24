@@ -2,6 +2,9 @@
 
 using namespace ArbiterDataService;
 using namespace ArbiterMaintenance;
+
+std::string     TCP_SHAKE_HAND_SEND_PATTERN     = "SYN";
+std::string     TCP_SHAKE_HAND_RECEIVE_PATTERN  = "SYNACK";
 ArbiterRC TcpDataItem::Update()
 {
     ArbiterRC rc = ARBITER_OK;
@@ -10,24 +13,25 @@ ArbiterRC TcpDataItem::Update()
     if(connect(m_socketFd, (sockaddr*)(&m_sockAddr), sizeof(m_sockAddr)) < 0)
     {
         ArbiterTracer::Error(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::ACTION_CONNECT, errno);
-        rc = 1000 * ArbiterTracer::ACTION_CONNECT + errno;
+        rc = CalErrorCode(ArbiterTracer::ACTION_CONNECT);
         goto Exit;
     }
-    if(send(m_sockFd, sendBuf, strlen(sendBuf) + 1, 0) < 0)
+    if(send(m_socketFd, sendBuf, strlen(sendBuf) + 1, 0) < 0)
     {
         ArbiterTracer::Error(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::ACTION_SEND, errno);
-        ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::ACTION_SEND, "Error When Sending: [" + m_sendStr + "]");
-        rc = 1000 * ArbiterTracer::ACTION_SEND + errno;
+        ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::ACTION_SEND, ArbiterTracer::SERVERITY_INFO,
+                                 "Error When Sending: [" + m_sendStr + "]");
+        rc = CalErrorCode(ArbiterTracer::ACTION_SEND);
         goto Exit;
     }
-    ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::SERVERITY_INFO, "Message: [" + sendStr + "] sent");
+    ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::SERVERITY_INFO, "Message: [" + m_sendStr + "] sent");
 
     {
-    ArbiterTracer::WriteLine(ArbiterTracerCATEGORY_SOCKET, ArbiterTracerSERVERITY_INFO, "Waiting For Server Response....");
+    ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::SERVERITY_INFO, "Waiting For Server Response....");
     if((recv(m_socketFd, receivedBuf, sizeof(receivedBuf), 0)) < 0)
     {
         ArbiterTracer::Error(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::ACTION_RECEIVE, errno);
-        rc = 1000 * ArbiterTracer::ACTION_RECEIVE + errno;
+        rc = CalErrorCode(ArbiterTracer::ACTION_RECEIVE);
         goto Exit;
     }
     std::string receiveStr(receivedBuf);
@@ -42,7 +46,7 @@ Exit:
 ArbiterRC TcpDataItem::ShakeHand()
 {
     ArbiterRC rc = ARBITER_OK;
-    m_sendStr = "SYN";
+    m_sendStr = TCP_SHAKE_HAND_SEND_PATTERN;
 
     rc = Update();
     if(rc != ARBITER_OK)
@@ -50,10 +54,12 @@ ArbiterRC TcpDataItem::ShakeHand()
         goto Exit;
     }
 
-    if(m_receivedStr != "SYNACK")
+    if(m_receivedStr != TCP_SHAKE_HAND_RECEIVE_PATTERN)
     {
-        ArbiterTracer::WriteLine(ArbiterTracer::SERVERITY_ERROR, ArbiterTracer::ACTION_TCP_SHAKE_HAND, "Error Patter Responsed From The Server: \n" +
-                                                                "Expected: [SYNACK], Actual: [" + m_receivedStr + "]");
+        ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_TCP, ArbiterTracer::ACTION_TCP_SHAKE_HAND, ArbiterTracer::SERVERITY_ERROR,
+                                 "Error Patter Responsed From The Server: \nExpected: ["
+                                 + TCP_SHAKE_HAND_RECEIVE_PATTERN + "], Actual: ["
+                                 + m_receivedStr + "]");
         goto Exit;
     }
 
@@ -65,7 +71,13 @@ ArbiterRC TcpDataItem::ShakeHand()
     }
 
 Exit:
-    ArbiterTracer::Error(ArbiterTracer::SERVERITY_ERROR, ArbiterTracer::ACTION_TCP_SHAKE_HAND, errno);
-    rc = 1000 * ArbiterTracer::ACTION_TCP_SHAKE_HAND + errno;
+    ArbiterTracer::Error(ArbiterTracer::CATEGORY_TCP, ArbiterTracer::ACTION_TCP_SHAKE_HAND, errno);
+    rc = CalErrorCode(ArbiterTracer::ACTION_TCP_SHAKE_HAND);
+    return rc;
+}
+
+ArbiterRC TcpDataItem::Disconnect()
+{
+    ArbiterRC rc = ARBITER_OK;
     return rc;
 }

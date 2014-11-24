@@ -6,7 +6,6 @@ using namespace ArbiterMaintenance;
 namespace ArbiterTransport
 {
 
-extern int errno;
 class ArbiterBasicTransport
 {
 public:

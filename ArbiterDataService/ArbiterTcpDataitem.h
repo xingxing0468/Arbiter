@@ -1,9 +1,13 @@
 #ifndef ARBITERTCPDATAITEM_H
 #define ARBITERTCPDATAITEM_H
 #include "ArbiterDataServiceItem.h"
+#include "stdio.h"
 
 using namespace ArbiterTransport;
 namespace ArbiterDataService {
+
+const static std::string            TCP_SHAKE_HAND_SEND_PATTERN;
+const static std::string            TCP_SHAKE_HAND_RECEIVE_PATTERN;
 
 class TcpDataItem : public DataServiceItem
 {

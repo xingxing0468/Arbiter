@@ -16,7 +16,7 @@ namespace ArbiterMaintenance
         APP_NAME_SERVER,
         APP_NAME_CLIENT,
     };
-	const static std::string Category[]			= {"Message Queue", 		"SOCKET"		      };
+    const static std::string Category[]			= {"Message Queue", 		"SOCKET",		      "TCP"};
 	const static std::string Action[]			= {"NONE",			"Create",			"Bind",
                                    "Set Option",		"Listen",			"Accept",
 								   "Connect",			"Send",				"Send To",
@@ -39,6 +39,7 @@ namespace ArbiterMaintenance
 		{
 			CATEGORY_MESSAGE_QUEUE,
 			CATEGORY_SOCKET,
+            CATEGORY_TCP,
 		};
 
 		enum ACTION
