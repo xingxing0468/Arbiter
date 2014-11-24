@@ -3,8 +3,9 @@
 using namespace ArbiterDataService;
 using namespace ArbiterMaintenance;
 
-std::string     TCP_SHAKE_HAND_SEND_PATTERN     = "SYN";
-std::string     TCP_SHAKE_HAND_RECEIVE_PATTERN  = "SYNACK";
+std::string     TCP_SYN     = "SYN";
+std::string     TCP_ACK     = "ACK";
+std::string     TCP_FIN     = "FIN";
 ArbiterRC TcpDataItem::Update()
 {
     ArbiterRC rc = ARBITER_OK;
@@ -27,16 +28,16 @@ ArbiterRC TcpDataItem::Update()
     ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::SERVERITY_INFO, "Message: [" + m_sendStr + "] sent");
 
     {
-    ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::SERVERITY_INFO, "Waiting For Server Response....");
-    if((recv(m_socketFd, receivedBuf, sizeof(receivedBuf), 0)) < 0)
-    {
-        ArbiterTracer::Error(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::ACTION_RECEIVE, errno);
-        rc = CalErrorCode(ArbiterTracer::ACTION_RECEIVE);
-        goto Exit;
-    }
-    std::string receiveStr(receivedBuf);
-    ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::SERVERITY_INFO, "Received Message: [" +  receiveStr + "]");
-    m_receivedStr = receiveStr;
+        ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::SERVERITY_INFO, "Waiting For Server Response....");
+        if((recv(m_socketFd, receivedBuf, sizeof(receivedBuf), 0)) < 0)
+        {
+            ArbiterTracer::Error(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::ACTION_RECEIVE, errno);
+            rc = CalErrorCode(ArbiterTracer::ACTION_RECEIVE);
+            goto Exit;
+        }
+        std::string receiveStr(receivedBuf);
+        ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_SOCKET, ArbiterTracer::SERVERITY_INFO, "Received Message: [" +  receiveStr + "]");
+        m_receivedStr = receiveStr;
     }
 
 Exit:
@@ -54,16 +55,17 @@ ArbiterRC TcpDataItem::ShakeHand()
         goto Exit;
     }
 
-    if(m_receivedStr != TCP_SHAKE_HAND_RECEIVE_PATTERN)
+    if(m_receivedStr != TCP_SYN + TCP_ACK)
     {
         ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_TCP, ArbiterTracer::ACTION_TCP_SHAKE_HAND, ArbiterTracer::SERVERITY_ERROR,
                                  "Error Patter Responsed From The Server: \nExpected: ["
-                                 + TCP_SHAKE_HAND_RECEIVE_PATTERN + "], Actual: ["
+                                 + TCP_SYN + TCP_ACK + "], Actual: ["
                                  + m_receivedStr + "]");
+        rc = CalErrorCode(ArbiterTracer::ACTION_TCP_SHAKE_HAND);
         goto Exit;
     }
 
-    m_sendStr = "ACK";
+    m_sendStr = TCP_ACK;
     rc = Update();
     if(rc != ARBITER_OK)
     {
@@ -79,5 +81,21 @@ Exit:
 ArbiterRC TcpDataItem::Disconnect()
 {
     ArbiterRC rc = ARBITER_OK;
-    return rc;
+    m_sendStr = TCP_FIN;
+
+    rc = Update();
+    if(rc != ARBITER_OK)
+    {
+        goto Exit;
+    }
+
+    if(m_receivedStr != TCP_ACK)
+    {
+        ArbiterTracer::WriteLine(ArbiterTracer::CATEGORY_TCP, ArbiterTracer::ACTION_DISCONNECT, ArbiterTracer::SERVERITY_ERROR,
+                                 "Error Patter Responsed From The Server: \nExpected: ["
+                                 + TCP_ACK + "], Actual: ["
+                                 + m_receivedStr + "]");
+        goto Exit;
+    }
+    return DataServiceItem::Disconnect();
 }

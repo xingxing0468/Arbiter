@@ -16,14 +16,16 @@ namespace ArbiterMaintenance
         APP_NAME_SERVER,
         APP_NAME_CLIENT,
     };
-    const static std::string Category[]			= {"Message Queue", 		"SOCKET",		      "TCP"};
-	const static std::string Action[]			= {"NONE",			"Create",			"Bind",
+    const static std::string Category[]			= {"Message Queue", 		"SOCKET",		      "TCP",
+                                                   "Thread"};
+    const static std::string Action[]			= {"NONE",			"Create",			"Bind",
                                    "Set Option",		"Listen",			"Accept",
 								   "Connect",			"Send",				"Send To",
 								   "Receive",			"Receive From",			"Unlink",
 					         		   "Close",			"Remove",			"Open File Descriptor",
 								   "Close File",		"Read File",		 	"Write FILE",
-                                   "Flush File",		"CLose File",       "TCP Shake Hand"};
+                                   "Flush File",		"CLose File",           "Disconnect",
+                                   "TCP Shake Hand",    "Thread Null Subject",};
 
 	const static std::string APP_NAME[]			= {"Server",	"Client"};
     class ArbiterTracer
@@ -40,6 +42,7 @@ namespace ArbiterMaintenance
 			CATEGORY_MESSAGE_QUEUE,
 			CATEGORY_SOCKET,
             CATEGORY_TCP,
+            CATEGORY_THREAD,
 		};
 
 		enum ACTION
@@ -64,8 +67,11 @@ namespace ArbiterMaintenance
 			ACTION_WRITE_FP,
 			ACTION_FLUSH_FP,
 			ACTION_CLOSE_FP,
+            ACTION_DISCONNECT,
 
             ACTION_TCP_SHAKE_HAND,
+
+            ACTION_THREAD_INIT,
 		};
 
 		enum SERVERITY
@@ -90,11 +96,11 @@ namespace ArbiterMaintenance
 					  << ": "		<<	message			<< std::endl;
 			}
 			return;
-		};
+        }
 		static void WriteLine(CATEGORY eCategory, SERVERITY eServerity, std::string message)
 		{
 			return WriteLine(eCategory, ACTION_NONE, eServerity, message);
-		};
+        }
 		static void Error(CATEGORY eCategory, ACTION eAction, int errorCode)
 		{
 			char errorCodeCharArray[10];
@@ -103,7 +109,7 @@ namespace ArbiterMaintenance
 			errorCodeStr.assign(errorCodeCharArray);
 			std::string msgStr = "errno [" + errorCodeStr + "]";
 			return WriteLine(eCategory, eAction, SERVERITY_ERROR, msgStr);
-		};
+        }
 	};
 
 }

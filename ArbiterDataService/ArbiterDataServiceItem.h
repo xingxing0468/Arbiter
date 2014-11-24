@@ -3,6 +3,8 @@
 
 #include "../ArbiterTransport/ArbiterTransport.h"
 #include "../ArbiterMaintenance/ArbiterRC.h";
+#include "../ArbiterThreadService/ArbiterThreadSubject.h"
+#include "../ArbiterThreadService/ArbiterDataListener.h"
 
 #include "sys/socket.h"
 #include "sys/types.h"
@@ -10,6 +12,7 @@
 
 using namespace ArbiterTransport;
 using namespace ArbiterMaintenance;
+using namespace ArbiterThreadService;
 namespace ArbiterDataService
 {
 class DataServiceItem
@@ -19,7 +22,9 @@ public:
                        m_socketDomain(0),
                        m_socketType(0),
                        m_sendStr(""),
-                       m_receivedStr("")
+                       m_receivedStr(""),
+                       m_threadSubject(NULL),
+                       m_recvListener(NULL)
     {
         memset(&m_sockAddr, 0, sizeof(sockaddr_un));
         m_socketAddrStr = DEFAULT_SOCKET_ADDR;
@@ -46,6 +51,10 @@ public:
             goto Exit;
         }
         rc = ShakeHand();
+        m_threadSubject = new ArbiterThreadObserver();
+        m_recvListener = new ArbiterDataListener();
+        m_threadSubject->Attach(m_recvListener);
+
     Exit:
         return rc;
     }
@@ -61,6 +70,12 @@ public:
         }
         return rc;
     }
+    void                                    DeleteObj()
+    {
+        if(!m_threadSubject) { delete m_threadSubject;}
+        if(!m_recvListener)  { delete m_recvListener; }
+        return;
+    }
     static std::string                      DEFAULT_SOCKET_ADDR;
 private:
     std::string                             m_socketAddrStr;
@@ -72,6 +87,8 @@ protected:
     int                                     m_socketType;
     int                                     m_socketFd;
     sockaddr_un                             m_sockAddr;
+    ArbiterThreadSubject                    *m_threadSubject;
+    ArbiterThreadService                    *m_recvListener;
 };
 
 }

@@ -4,10 +4,12 @@
 #include "stdio.h"
 
 using namespace ArbiterTransport;
+
 namespace ArbiterDataService {
 
-const static std::string            TCP_SHAKE_HAND_SEND_PATTERN;
-const static std::string            TCP_SHAKE_HAND_RECEIVE_PATTERN;
+const static std::string            TCP_SYN;
+const static std::string            TCP_ACK;
+const static std::string            TCP_FIN;
 
 class TcpDataItem : public DataServiceItem
 {
@@ -20,7 +22,14 @@ public:
     {
         m_socketDomain = AF_LOCAL;
         m_socketType   = SOCK_STREAM;
-        return DataServiceItem::Init();
+        rc = DataServiceItem::Init();
+        if(rc != ARBITER_OK)
+        {
+            goto Exit;
+        }
+
+    Exit:
+        return rc;
     }
     ArbiterRC                           Disconnect();
     ArbiterRC                           ShakeHand();
