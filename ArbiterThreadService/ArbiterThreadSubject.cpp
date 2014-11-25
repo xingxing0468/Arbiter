@@ -1,5 +1,15 @@
 #include "ArbiterThreadSubject.h"
 
-ThreadSubject::ThreadSubject()
+using namespace ArbiterThreadService;
+
+ArbiterThreadSubject::ArbiterThreadSubject()
 {
+
+    return;
+}
+
+ArbiterThreadSubject::~ArbiterThreadSubject()
+{
+
+    return;
 }

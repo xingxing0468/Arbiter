@@ -2,7 +2,7 @@
 #define _ARBITER_DATA_SERVICE_H
 
 #include "../ArbiterTransport/ArbiterTransport.h"
-#include "../ArbiterMaintenance/ArbiterRC.h";
+#include "../ArbiterMaintenance/ArbiterRC.h"
 #include "../ArbiterThreadService/ArbiterThreadSubject.h"
 #include "../ArbiterThreadService/ArbiterDataListener.h"
 
@@ -51,7 +51,7 @@ public:
             goto Exit;
         }
         rc = ShakeHand();
-        m_threadSubject = new ArbiterThreadObserver();
+        m_threadSubject = new ArbiterThreadSubject();
         m_recvListener = new ArbiterDataListener();
         m_threadSubject->Attach(m_recvListener);
 
@@ -70,7 +70,7 @@ public:
         }
         return rc;
     }
-    void                                    DeleteObj()
+    virtual void                            DeleteObj()
     {
         if(!m_threadSubject) { delete m_threadSubject;}
         if(!m_recvListener)  { delete m_recvListener; }
@@ -88,7 +88,7 @@ protected:
     int                                     m_socketFd;
     sockaddr_un                             m_sockAddr;
     ArbiterThreadSubject                    *m_threadSubject;
-    ArbiterThreadService                    *m_recvListener;
+    ArbiterThreadObserver                   *m_recvListener;
 };
 
 }

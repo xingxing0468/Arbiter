@@ -4,12 +4,12 @@
 
 namespace ArbiterThreadService
 {
-class ArbiterDataListener: ArbiterThreadObserver
+class ArbiterDataListener: public ArbiterThreadObserver
 {
 public:
-    ArbiterDataListener()
+    ArbiterDataListener(): ArbiterThreadObserver(LISTENER)
     {
-        ArbiterThreadObserver::ArbiterThreadObserver(LISTENER);
+
     }
     std::string                     ReceivedStr()
     {

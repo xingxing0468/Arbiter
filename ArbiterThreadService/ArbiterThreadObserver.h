@@ -10,18 +10,18 @@ using namespace ArbiterMaintenance;
 namespace ArbiterThreadService
 {
 
-static std::string          LISTENER;
+static std::string          LISTENER = "Arbiter Data Listener";
 class ArbiterThreadObserver
 {
 public:
         ArbiterThreadObserver(): m_threadId(0){
 
         }
-        ArbiterThreadObserver(std::string threadName): m_threadName(threadName)
+        ArbiterThreadObserver(std::string threadName): m_threadName(threadName), m_threadId(0)
         {
-            ArbiterThreadObserver();
-        }
 
+        }
+        virtual ~ArbiterThreadObserver(){}
         virtual ArbiterRC               InitArbiterThread()
         {
             ArbiterRC rc = ARBITER_OK;
@@ -29,11 +29,11 @@ public:
         Exit:
             return rc;
         }
-        virtual ArbiterRC               Lauch() = 0;
-        virtual ArbiterRC               Init()  = 0;
-        virtual ArbiterRC               Start() = 0;
-        virtual ArbiterRC               Pause() = 0;
-        virtual ArbiterRC               Stop()  = 0;
+        virtual ArbiterRC               Lauch() {}
+        virtual ArbiterRC               Init()  {}
+        virtual ArbiterRC               Start() {}
+        virtual ArbiterRC               Pause() {}
+        virtual ArbiterRC               Stop()  {}
 protected:
         typedef ArbiterRC               (ArbiterThreadObserver::*FuncPtr)();
         std::string                     m_threadName;

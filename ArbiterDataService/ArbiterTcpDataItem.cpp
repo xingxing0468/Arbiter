@@ -47,7 +47,7 @@ Exit:
 ArbiterRC TcpDataItem::ShakeHand()
 {
     ArbiterRC rc = ARBITER_OK;
-    m_sendStr = TCP_SHAKE_HAND_SEND_PATTERN;
+    m_sendStr = TCP_SYN;
 
     rc = Update();
     if(rc != ARBITER_OK)
@@ -97,5 +97,8 @@ ArbiterRC TcpDataItem::Disconnect()
                                  + m_receivedStr + "]");
         goto Exit;
     }
-    return DataServiceItem::Disconnect();
+    rc = DataServiceItem::Disconnect();
+
+Exit:
+    return rc;
 }

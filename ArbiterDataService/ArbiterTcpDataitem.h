@@ -20,6 +20,7 @@ public:
     ArbiterRC                           Update();
     ArbiterRC                           Init()
     {
+        ArbiterRC rc = ARBITER_OK;
         m_socketDomain = AF_LOCAL;
         m_socketType   = SOCK_STREAM;
         rc = DataServiceItem::Init();

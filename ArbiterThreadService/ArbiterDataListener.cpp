@@ -1,5 +1,5 @@
 #include "ArbiterDataListener.h"
 
-ArbiterDataListener::ArbiterDataListener()
-{
-}
+
+using namespace ArbiterThreadService;
+

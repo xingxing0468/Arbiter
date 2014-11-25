@@ -11,17 +11,13 @@ class ArbiterThreadSubject
 {
 public:
     ArbiterThreadSubject();
-
-protected:
-    std::list<ArbiterThreadObserver*>       m_threadObserverList;
     virtual ArbiterRC                       Attach(ArbiterThreadObserver* threadOb)
     {
         ArbiterRC rc = ARBITER_OK;
-        m_threadObObserverList.push_back(threadOb);
+        m_threadObserverList.push_back(threadOb);
     Exit:
         return rc;
     }
-
     virtual ArbiterRC                       LauchAll()
     {
         ArbiterRC rc = ARBITER_OK;
@@ -34,9 +30,17 @@ protected:
         Exit:
             return rc;
     }
-    virtual ArbiterRC           Init();
+    virtual ArbiterRC                       Detach()
+    {
+        ArbiterRC rc = ARBITER_OK;
 
-    virtual ArbiterRC           Detach() = 0;
+    Exit:
+        return rc;
+    }
+    virtual ~ArbiterThreadSubject();
+protected:
+    std::list<ArbiterThreadObserver*>       m_threadObserverList;
+    virtual ArbiterRC                       Init(){}
 
 private:
 
