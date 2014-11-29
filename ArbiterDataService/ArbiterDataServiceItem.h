@@ -51,10 +51,10 @@ public:
             goto Exit;
         }
         rc = ShakeHand();
-        m_threadSubject = new ArbiterThreadSubject();
-        m_recvListener = new ArbiterDataListener();
+        m_threadSubject = new ThreadSubject();
+        m_recvListener = new DataListener();
         m_threadSubject->Attach(m_recvListener);
-
+        m_threadSubject->LauchAll();
     Exit:
         return rc;
     }
@@ -87,8 +87,8 @@ protected:
     int                                     m_socketType;
     int                                     m_socketFd;
     sockaddr_un                             m_sockAddr;
-    ArbiterThreadSubject                    *m_threadSubject;
-    ArbiterThreadObserver                   *m_recvListener;
+    ThreadSubject                           *m_threadSubject;
+    ThreadObserver                          *m_recvListener;
 };
 
 }

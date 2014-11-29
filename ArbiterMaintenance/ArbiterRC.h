@@ -12,7 +12,7 @@ enum ArbiterRC
 };
 
 ArbiterRC CalErrorCode(ArbiterTracer::ACTION currentAction);
-
+ArbiterRC CalErrorCode(ArbiterTracer::ACTION currentAction, int err);
 }
 
 #endif // ARBITERRC_H

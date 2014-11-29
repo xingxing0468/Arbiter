@@ -25,7 +25,8 @@ namespace ArbiterMaintenance
 					         		   "Close",			"Remove",			"Open File Descriptor",
 								   "Close File",		"Read File",		 	"Write FILE",
                                    "Flush File",		"CLose File",           "Disconnect",
-                                   "TCP Shake Hand",    "Thread Null Subject",};
+                                   "TCP Shake Hand",    "Thread Null Subject",  "Thread Lauch Fail",
+                                   "Semaphore Init",    "Semaphore Timed Wait",};
 
 	const static std::string APP_NAME[]			= {"Server",	"Client"};
     class ArbiterTracer
@@ -72,6 +73,10 @@ namespace ArbiterMaintenance
             ACTION_TCP_SHAKE_HAND,
 
             ACTION_THREAD_INIT,
+            ACTION_THREAD_LAUCH,
+
+            ACTION_SEMAPHORE_INIT,
+            ACTION_SEMAPHORE_TIMEWAIT,
 		};
 
 		enum SERVERITY
@@ -84,8 +89,18 @@ namespace ArbiterMaintenance
 		static std::string AppName;
         static std::string ProcessName;
 
-		static void WriteLine(CATEGORY eCategory, ACTION eAction, SERVERITY eServerity, std::string message)
+        static void WriteLine(CATEGORY eCategory, ACTION eAction, SERVERITY eServerity, std::string message,
+                              int threadId = 0, std::string threadName = "")
 		{
+            char threadIdCharStr[10];
+
+            std::string threadInfo = "";
+            if(!threadId && (threadName == ""))
+            {
+                sprintf(threadIdCharStr, "%d", threadId);
+                std::string threadIdStr(threadIdCharStr);
+                threadInfo = "[TID:" + threadIdStr + "][TName:" + threadName + "]";
+            }
 			if(eServerity | TraceLevel)
 			{
 				std::cout << "[PID:"		<<	getpid()		<< "]" 
@@ -93,7 +108,8 @@ namespace ArbiterMaintenance
 					  << "[App:"		<<	AppName			<< "]"
 					  << "["		<<	Category[eCategory]	<< "]"
 					  << "["		<<	Action[eAction]		<< "]"
-					  << ": "		<<	message			<< std::endl;
+                      << ": "		<<	message             << threadInfo
+                      << std::endl;
 			}
 			return;
         }

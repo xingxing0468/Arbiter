@@ -2,13 +2,13 @@
 
 using namespace ArbiterThreadService;
 
-ArbiterThreadSubject::ArbiterThreadSubject()
+ThreadSubject::ThreadSubject()
 {
 
     return;
 }
 
-ArbiterThreadSubject::~ArbiterThreadSubject()
+ThreadSubject::~ThreadSubject()
 {
 
     return;
